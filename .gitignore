@@ -45,4 +45,6 @@ _testmain.go
 *.exe
 //*.test
 .vscode/tasks.json
-/e2e/vendor/
+e2e/vendor/
+order/vendor/
+payment/vendor/

@@ -1,10 +1,13 @@
 package e2e
 
 import (
+	"context"
 	"strings"
 	"testing"
 
+	"github.com/dmitryovchinnikov/microservices-proto/pb/order"
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"google.golang.org/grpc"
