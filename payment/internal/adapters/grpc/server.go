@@ -32,9 +32,7 @@ func (a Adapter) Run() {
 		log.Fatalf("failed to listen on port %d, error: %v", a.port, err)
 	}
 
-	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
-	)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()))
 	a.server = grpcServer
 	payment.RegisterPaymentServer(grpcServer, a)
 	if config.GetEnv() == "development" {

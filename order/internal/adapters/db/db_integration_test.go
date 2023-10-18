@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"testing"
-	"time"
 
 	"github.com/dmitryovchinnikov/microservices/order/internal/application/core/domain"
 	"github.com/docker/go-connections/nat"
@@ -23,7 +22,7 @@ type OrderDatabaseTestSuite struct {
 func (o *OrderDatabaseTestSuite) SetupSuite() {
 	ctx := context.Background()
 	port := "3306/tcp"
-	dbURL := func(port nat.Port) string {
+	dbURL := func(host string, port nat.Port) string {
 		return fmt.Sprintf("root:s3cr3t@tcp(localhost:%s)/orders?charset=utf8mb4&parseTime=True&loc=Local", port.Port())
 	}
 	req := testcontainers.ContainerRequest{
@@ -33,7 +32,7 @@ func (o *OrderDatabaseTestSuite) SetupSuite() {
 			"MYSQL_ROOT_PASSWORD": "s3cr3t",
 			"MYSQL_DATABASE":      "orders",
 		},
-		WaitingFor: wait.ForSQL(nat.Port(port), "mysql", dbURL).Timeout(time.Second * 30),
+		WaitingFor: wait.ForSQL(nat.Port(port), "mysql", dbURL),
 	}
 	mysqlContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
@@ -47,13 +46,15 @@ func (o *OrderDatabaseTestSuite) SetupSuite() {
 }
 
 func (o *OrderDatabaseTestSuite) Test_Should_Save_Order() {
+	ctx := context.Background()
 	adapter, err := NewAdapter(o.DataSourceUrl)
 	o.Nil(err)
-	saveErr := adapter.Save(&domain.Order{})
+	saveErr := adapter.Save(ctx, &domain.Order{})
 	o.Nil(saveErr)
 }
 
 func (o *OrderDatabaseTestSuite) Test_Should_Get_Order() {
+	ctx := context.Background()
 	adapter, _ := NewAdapter(o.DataSourceUrl)
 	order := domain.NewOrder(2, []domain.OrderItem{
 		{
@@ -62,8 +63,11 @@ func (o *OrderDatabaseTestSuite) Test_Should_Get_Order() {
 			UnitPrice:   1.32,
 		},
 	})
-	adapter.Save(&order)
-	ord, _ := adapter.Get(order.ID)
+	err := adapter.Save(ctx, &order)
+	if err != nil {
+		return
+	}
+	ord, _ := adapter.Get(ctx, order.ID)
 	o.Equal(int64(2), ord.CustomerID)
 }
 

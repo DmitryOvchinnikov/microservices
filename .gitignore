@@ -43,7 +43,7 @@ _cgo_export.*
 _testmain.go
 
 *.exe
-//*.test
+#*.test
 .vscode/tasks.json
 e2e/vendor/
 order/vendor/

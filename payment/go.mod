@@ -3,6 +3,7 @@ module github.com/dmitryovchinnikov/microservices/payment
 go 1.21.0
 
 require (
+	github.com/dmitryovchinnikov/microservices-proto/pb v0.0.0-20231015133934-3902d6c49b9a
 	github.com/sirupsen/logrus v1.9.3
 	github.com/uptrace/opentelemetry-go-extra/otelgorm v0.2.3
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.45.0
